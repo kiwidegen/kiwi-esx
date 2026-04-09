@@ -118,11 +118,6 @@ tasks:
     ref: master
     dest: ./resources/[standalone]/[misc]/bob74_ipl
 
-  - action: download_github
-    src: https://github.com/AvarianKnight/pma-voice
-    ref: main
-    dest: ./resources/[standalone]/[misc]/pma-voice
-
   - action: download_file
     url: https://github.com/iLLeniumStudios/illenium-appearance/releases/latest/download/illenium-appearance.zip
     path: ./tmp/illenium-appearance.zip
@@ -137,13 +132,6 @@ tasks:
     file: ./resources/[standalone]/[misc]/illenium-appearance/sql/management_outfits.sql
   - action: query_database
     file: ./resources/[standalone]/[misc]/illenium-appearance/sql/playerskins.sql
-
-  - action: download_file
-    url: https://github.com/Renewed-Scripts/Renewed-Weathersync/releases/latest/download/Renewed-Weathersync.zip
-    path: ./tmp/Renewed-Weathersync.zip
-  - action: unzip
-    src: ./tmp/Renewed-Weathersync.zip
-    dest: ./resources/[standalone]/[misc]/
 
   - action: download_file
     url: https://github.com/itschip/screencapture/releases/latest/download/screencapture.zip
