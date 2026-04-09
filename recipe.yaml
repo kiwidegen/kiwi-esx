@@ -63,78 +63,53 @@ tasks:
   - action: query_database
     file: ./resources/[base]/es_extended/es_extended.sql
 
-  - action: query_database
-    file: ./resources/[ox]/ox_inventory/ox_inventory.sql
-
-  - action: query_database
-    file: ./resources/[ox]/ox_doorlock/sql/ox_doorlock.sql
-
-  - action: query_database
-    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/player_outfits.sql
-
-  - action: query_database
-    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/player_outfit_codes.sql
-
-  - action: query_database
-    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/management_outfits.sql
-
-  - action: query_database
-    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/playerskins.sql
-
   # ============================
   # OX RESOURCES
   # ============================
   - action: download_file
-    url: https://github.com/CommunityOx/oxmysql/releases/download/v2.12.3/oxmysql.zip
+    url: https://github.com/CommunityOx/oxmysql/releases/latest/download/oxmysql.zip
     path: ./tmp/oxmysql.zip
   - action: unzip
     src: ./tmp/oxmysql.zip
     dest: ./resources/[ox]/
-  - action: waste_time
-    seconds: 5
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_lib/releases/download/v3.32.3/ox_lib.zip
+    url: https://github.com/CommunityOx/ox_lib/releases/latest/download/ox_lib.zip
     path: ./tmp/ox_lib.zip
   - action: unzip
     src: ./tmp/ox_lib.zip
     dest: ./resources/[ox]/
-  - action: waste_time
-    seconds: 5
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_inventory/releases/download/v2.45.0/ox_inventory.zip
+    url: https://github.com/CommunityOx/ox_inventory/releases/latest/download/ox_inventory.zip
     path: ./tmp/ox_inventory.zip
   - action: unzip
     src: ./tmp/ox_inventory.zip
     dest: ./resources/[ox]/
-  - action: waste_time
-    seconds: 5
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_target/releases/download/v1.18.0/ox_target.zip
+    url: https://github.com/CommunityOx/ox_target/releases/latest/download/ox_target.zip
     path: ./tmp/ox_target.zip
   - action: unzip
     src: ./tmp/ox_target.zip
     dest: ./resources/[ox]/
-  - action: waste_time
-    seconds: 5
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_fuel/releases/download/v1.5.2/ox_fuel.zip
+    url: https://github.com/CommunityOx/ox_fuel/releases/latest/download/ox_fuel.zip
     path: ./tmp/ox_fuel.zip
   - action: unzip
     src: ./tmp/ox_fuel.zip
     dest: ./resources/[ox]/
-  - action: waste_time
-    seconds: 5
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_doorlock/releases/download/v1.22.0/ox_doorlock.zip
+    url: https://github.com/CommunityOx/ox_doorlock/releases/latest/download/ox_doorlock.zip
     path: ./tmp/ox_doorlock.zip
   - action: unzip
     src: ./tmp/ox_doorlock.zip
     dest: ./resources/[ox]/
+  - action: query_database
+    file: ./resources/[ox]/ox_doorlock/sql/ox_doorlock.sql
+
   - action: waste_time
     seconds: 5
 
@@ -145,36 +120,36 @@ tasks:
     src: https://github.com/Bob74/bob74_ipl
     ref: master
     dest: ./resources/[standalone]/[misc]/bob74_ipl
-  - action: waste_time
-    seconds: 5
 
   - action: download_github
     src: https://github.com/AvarianKnight/pma-voice
     ref: main
     dest: ./resources/[standalone]/[misc]/pma-voice
-  - action: waste_time
-    seconds: 5
 
   - action: download_file
-    url: https://github.com/iLLeniumStudios/illenium-appearance/releases/download/v5.7.0/illenium-appearance.zip
+    url: https://github.com/iLLeniumStudios/illenium-appearance/releases/latest/download/illenium-appearance.zip
     path: ./tmp/illenium-appearance.zip
   - action: unzip
     src: ./tmp/illenium-appearance.zip
     dest: ./resources/[standalone]/[misc]/
-  - action: waste_time
-    seconds: 5
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/player_outfits.sql
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/player_outfit_codes.sql
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/management_outfits.sql
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/playerskins.sql
 
   - action: download_file
-    url: https://github.com/Renewed-Scripts/Renewed-Weathersync/releases/download/v1.1.8/Renewed-Weathersync.zip
+    url: https://github.com/Renewed-Scripts/Renewed-Weathersync/releases/latest/download/Renewed-Weathersync.zip
     path: ./tmp/Renewed-Weathersync.zip
   - action: unzip
     src: ./tmp/Renewed-Weathersync.zip
     dest: ./resources/[standalone]/[misc]/
-  - action: waste_time
-    seconds: 5
 
   - action: download_file
-    url: https://github.com/itschip/screencapture/releases/download/v0.11.0/screencapture.zip
+    url: https://github.com/itschip/screencapture/releases/latest/download/screencapture.zip
     path: ./tmp/screencapture.zip
   - action: unzip
     src: ./tmp/screencapture.zip
