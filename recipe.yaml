@@ -14,9 +14,7 @@ tasks:
     ref: master
     subpath: resources
     dest: ./resources/[cfx-default]
-  # ============================
-  # KIWI ESX BASE
-  # ============================
+ 
   - action: download_github
     src: https://github.com/kiwidegen/kiwi-esx
     ref: main
