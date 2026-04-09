@@ -258,6 +258,7 @@ tasks:
       ["cola", 1, 1],
       ["water", 1, 1],
       ["garbage", 1, 2, 50],
+      ["panties", 1, 1, 5],
       ["money", 1, 50],
       ["money", 200, 400, 5],
       ["bandage", 1, 1]
@@ -365,19 +366,17 @@ tasks:
       ensure ox_lib
       ensure chat
       ensure hardcap
+      ensure pma-voice
 
       # --- Base ---
       ensure cron
       ensure es_extended
 
       # --- OX Suite ---
-      ensure ox_inventory
       ensure ox_target
+      ensure ox_inventory
       ensure ox_fuel
       ensure ox_doorlock
-
-      # --- Voice ---
-      ensure pma-voice
 
       # --- Appearance ---
       ensure illenium-appearance
