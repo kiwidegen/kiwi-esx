@@ -63,6 +63,24 @@ tasks:
   - action: query_database
     file: ./resources/[base]/es_extended/es_extended.sql
 
+  - action: query_database
+    file: ./resources/[ox]/ox_inventory/ox_inventory.sql
+
+  - action: query_database
+    file: ./resources/[ox]/ox_doorlock/sql/ox_doorlock.sql
+
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/player_outfits.sql
+
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/player_outfit_codes.sql
+
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/management_outfits.sql
+
+  - action: query_database
+    file: ./resources/[standalone]/[misc]/illenium-appearance/sql/playerskins.sql
+
   # ============================
   # OX RESOURCES
   # ============================
@@ -73,7 +91,7 @@ tasks:
     src: ./tmp/oxmysql.zip
     dest: ./resources/[ox]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/CommunityOx/ox_lib/releases/download/v3.32.3/ox_lib.zip
@@ -82,7 +100,7 @@ tasks:
     src: ./tmp/ox_lib.zip
     dest: ./resources/[ox]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/CommunityOx/ox_inventory/releases/download/v2.45.0/ox_inventory.zip
@@ -91,7 +109,7 @@ tasks:
     src: ./tmp/ox_inventory.zip
     dest: ./resources/[ox]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/CommunityOx/ox_target/releases/download/v1.18.0/ox_target.zip
@@ -100,7 +118,7 @@ tasks:
     src: ./tmp/ox_target.zip
     dest: ./resources/[ox]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/CommunityOx/ox_fuel/releases/download/v1.5.2/ox_fuel.zip
@@ -109,7 +127,7 @@ tasks:
     src: ./tmp/ox_fuel.zip
     dest: ./resources/[ox]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/CommunityOx/ox_doorlock/releases/download/v1.22.0/ox_doorlock.zip
@@ -118,7 +136,7 @@ tasks:
     src: ./tmp/ox_doorlock.zip
     dest: ./resources/[ox]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   # ============================
   # STANDALONE / MISC
@@ -128,14 +146,14 @@ tasks:
     ref: master
     dest: ./resources/[standalone]/[misc]/bob74_ipl
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_github
     src: https://github.com/AvarianKnight/pma-voice
     ref: main
     dest: ./resources/[standalone]/[misc]/pma-voice
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/iLLeniumStudios/illenium-appearance/releases/download/v5.7.0/illenium-appearance.zip
@@ -144,7 +162,7 @@ tasks:
     src: ./tmp/illenium-appearance.zip
     dest: ./resources/[standalone]/[misc]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/Renewed-Scripts/Renewed-Weathersync/releases/download/v1.1.8/Renewed-Weathersync.zip
@@ -153,7 +171,7 @@ tasks:
     src: ./tmp/Renewed-Weathersync.zip
     dest: ./resources/[standalone]/[misc]/
   - action: waste_time
-    seconds: 10
+    seconds: 5
 
   - action: download_file
     url: https://github.com/itschip/screencapture/releases/download/v0.11.0/screencapture.zip
