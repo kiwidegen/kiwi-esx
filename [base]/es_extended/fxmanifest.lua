@@ -34,7 +34,6 @@ server_scripts {
 	'server/modules/commands.lua',
 
 	'server/bridge/**/*.lua',
-	'server/modules/npwd.lua',
 	'server/modules/createJob.lua',
 	'server/migration/**/main.lua',
 	'server/migration/main.lua',
@@ -52,7 +51,6 @@ client_scripts {
 
 	'client/modules/actions.lua',
 	'client/modules/death.lua',
-	'client/modules/npwd.lua',
     'client/modules/interactions.lua',
 	'client/modules/scaleform.lua',
 	'client/modules/streaming.lua',
