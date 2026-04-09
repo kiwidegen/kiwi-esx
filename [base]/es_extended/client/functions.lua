@@ -103,6 +103,12 @@ end
 ---@param cb function Callback function
 ---@return nil
 function ESX.SpawnPlayer(skin, coords, cb)
+    local p = promise.new()
+    TriggerEvent("skinchanger:loadSkin", skin, function()
+        p:resolve()
+    end)
+    Citizen.Await(p)
+
     RequestCollisionAtCoord(coords.x, coords.y, coords.z)
 
     local playerPed = PlayerPedId()
