@@ -1,3 +1,6 @@
+$engine: 3
+$onesync: on
+
 name: Kiwi ESX
 version: "1.0"
 author: kiwidegen
@@ -7,41 +10,46 @@ description: >
   illenium-appearance, bob74_ipl, pma-voice, Renewed-Weathersync and screencapture.
   Bring your own multichar - any resource that fires esx:onPlayerJoined will work.
 
-variables:
-  - name: db_host
-    description: Database host
-    default: localhost
-  - name: db_port
-    description: Database port
-    default: "3306"
-  - name: db_username
-    description: Database username
-    default: root
-  - name: db_password
-    description: Database password
-    default: ""
-  - name: db_name
-    description: Database name
-    default: es_extended
-  - name: server_license
-    description: FiveM server license key
-    default: ""
-  - name: server_name
-    description: Server display name
-    default: "Kiwi ESX"
-  - name: server_maxclients
-    description: Max player slots
-    default: "64"
-
 tasks:
 
   # ============================
-  # BASE RESOURCES
+  # CFX DEFAULT RESOURCES
   # ============================
   - action: download_github
-    src: kiwidegen/kiwi-esx
+    src: https://github.com/citizenfx/cfx-server-data
+    ref: master
+    subpath: resources
+    dest: ./resources/[cfx-default]
+  - action: remove_path
+    path: ./resources/[cfx-default]/[gameplay]/chat
+
+  # ============================
+  # KIWI ESX BASE
+  # ============================
+  - action: download_github
+    src: https://github.com/kiwidegen/kiwi-esx
     ref: main
-    dest: ./resources
+    dest: ./tmp/kiwi-esx
+
+  - action: move_path
+    src: ./tmp/kiwi-esx/[base]
+    dest: ./resources/[base]
+
+  - action: move_path
+    src: ./tmp/kiwi-esx/[standalone]
+    dest: ./resources/[standalone]
+
+  - action: move_path
+    src: ./tmp/kiwi-esx/[scripts]
+    dest: ./resources/[scripts]
+
+  # ============================
+  # DATABASE
+  # ============================
+  - action: connect_database
+
+  - action: query_database
+    file: ./resources/[base]/es_extended/es_extended.sql
 
   # ============================
   # OX RESOURCES
@@ -91,32 +99,22 @@ tasks:
   # ============================
   # STANDALONE / MISC
   # ============================
+  - action: download_github
+    src: https://github.com/Bob74/bob74_ipl
+    ref: master
+    dest: ./resources/[standalone]/[misc]/bob74_ipl
+
+  - action: download_github
+    src: https://github.com/AvarianKnight/pma-voice
+    ref: main
+    dest: ./resources/[standalone]/[misc]/pma-voice
+
   - action: download_file
     url: https://github.com/iLLeniumStudios/illenium-appearance/releases/download/v5.7.0/illenium-appearance.zip
     path: ./tmp/illenium-appearance.zip
   - action: unzip
     src: ./tmp/illenium-appearance.zip
     dest: ./resources/[standalone]/[misc]/
-
-  - action: download_file
-    url: https://github.com/Bob74/bob74_ipl/archive/refs/tags/2.6.0.zip
-    path: ./tmp/bob74_ipl.zip
-  - action: unzip
-    src: ./tmp/bob74_ipl.zip
-    dest: ./tmp/bob74_ipl_raw/
-  - action: move_path
-    src: ./tmp/bob74_ipl_raw/bob74_ipl-2.6.0
-    dest: ./resources/[standalone]/[misc]/bob74_ipl
-
-  - action: download_file
-    url: https://github.com/AvarianKnight/pma-voice/archive/refs/tags/v6.6.2.zip
-    path: ./tmp/pma-voice.zip
-  - action: unzip
-    src: ./tmp/pma-voice.zip
-    dest: ./tmp/pma_voice_raw/
-  - action: move_path
-    src: ./tmp/pma_voice_raw/pma-voice-6.6.2
-    dest: ./resources/[standalone]/[misc]/pma-voice
 
   - action: download_file
     url: https://github.com/Renewed-Scripts/Renewed-Weathersync/releases/download/v1.1.8/Renewed-Weathersync.zip
@@ -131,19 +129,6 @@ tasks:
   - action: unzip
     src: ./tmp/screencapture.zip
     dest: ./resources/[standalone]/[misc]/
-
-  # ============================
-  # DATABASE
-  # ============================
-  - action: connect_database
-    host: '%db_host%'
-    port: '%db_port%'
-    user: '%db_username%'
-    password: '%db_password%'
-    database: '%db_name%'
-
-  - action: query_database
-    file: ./resources/[base]/es_extended/es_extended.sql
 
   # ============================
   # SERVER.CFG
@@ -163,9 +148,6 @@ tasks:
       exec cfg/permissions.cfg
       exec cfg/resources.cfg
 
-  # ============================
-  # CFG/PRIVATE.CFG
-  # ============================
   - action: write_file
     file: ./cfg/private.cfg
     contents: |
@@ -177,14 +159,11 @@ tasks:
       #   ╚═╝  ╚═╝╚═╝ ╚══╝╚══╝ ╚═╝   ╚══════╝╚══════╝╚═╝  ╚═╝
 
       # --- License Key ---
-      sv_licenseKey "%server_license%"
+      sv_licenseKey "{{svLicenseKey}}"
 
       # --- Database Connection ---
-      set mysql_connection_string "mysql://%db_username%:%db_password%@%db_host%/%db_name%?charset=utf8mb4"
+      set mysql_connection_string "{{dbConnectionString}}"
 
-  # ============================
-  # CFG/CONVARS.CFG
-  # ============================
   - action: write_file
     file: ./cfg/convars.cfg
     contents: |
@@ -200,10 +179,10 @@ tasks:
       endpoint_add_udp "0.0.0.0:30120"
 
       # --- Basic Server Info ---
-      sets sv_projectName "%server_name%"
+      sets sv_projectName "Kiwi ESX"
       sets sv_projectDesc ""
-      sets sv_hostname "%server_name%"
-      sv_maxclients %server_maxclients%
+      sets sv_hostname "Kiwi ESX"
+      sv_maxclients 64
       sets locale "root-US"
       sv_enforceGameBuild 3258
 
@@ -224,7 +203,7 @@ tasks:
       setr bl:textui "ox"
       setr game_enableDynamicDoorCreation "true"
 
-      # --- OX Inventory Config ---
+      # --- OX Inventory ---
       setr inventory:framework "esx"
       setr inventory:slots 50
       setr inventory:weight 85000
@@ -297,9 +276,6 @@ tasks:
       # --- ESX ---
       setr esx:locale "en"
 
-  # ============================
-  # CFG/PERMISSIONS.CFG
-  # ============================
   - action: write_file
     file: ./cfg/permissions.cfg
     contents: |
@@ -348,9 +324,6 @@ tasks:
       # --- Add your admins below ---
       # add_principal identifier.license2:XXXXXXXX group.admin # your name
 
-  # ============================
-  # CFG/RESOURCES.CFG
-  # ============================
   - action: write_file
     file: ./cfg/resources.cfg
     contents: |
@@ -390,3 +363,9 @@ tasks:
       # --- Your Scripts (add below) ---
       # ensure [standalone]
       # ensure [scripts]
+
+  # ============================
+  # CLEANUP
+  # ============================
+  - action: remove_path
+    path: ./tmp
