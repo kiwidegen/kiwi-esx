@@ -48,3 +48,19 @@ CREATE TABLE IF NOT EXISTS `jobs` (
 ) ENGINE=InnoDB;
 
 INSERT IGNORE INTO `jobs` VALUES ('unemployed','Unemployed');
+
+CREATE TABLE IF NOT EXISTS `owned_vehicles` (
+	`owner` VARCHAR(60) NOT NULL,
+	`plate` VARCHAR(12) NOT NULL,
+	`vehicle` LONGTEXT NULL DEFAULT NULL,
+	`type` VARCHAR(20) NOT NULL DEFAULT 'car',
+	`job` VARCHAR(20) NULL DEFAULT NULL,
+	`stored` TINYINT NOT NULL DEFAULT 1,
+	PRIMARY KEY (`plate`)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `licenses` (
+	`type` VARCHAR(60) NOT NULL,
+	`label` VARCHAR(60) NOT NULL,
+	PRIMARY KEY (`type`)
+) ENGINE=InnoDB;
