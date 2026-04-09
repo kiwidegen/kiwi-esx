@@ -8,7 +8,7 @@ ALTER DATABASE `es_extended`
 
 USE `es_extended`;
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
 	`identifier` VARCHAR(60) NOT NULL,
 	`ssn` VARCHAR(11) NOT NULL,
 	`accounts` LONGTEXT NULL DEFAULT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `users` (
 	UNIQUE KEY `unique_ssn` (`ssn`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `items` (
+CREATE TABLE IF NOT EXISTS `items` (
 	`name` VARCHAR(50) NOT NULL,
 	`label` VARCHAR(50) NOT NULL,
 	`weight` INT NOT NULL DEFAULT 1,
@@ -34,7 +34,7 @@ CREATE TABLE `items` (
 	PRIMARY KEY (`name`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `job_grades` (
+CREATE TABLE IF NOT EXISTS `job_grades` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`job_name` VARCHAR(50) DEFAULT NULL,
 	`grade` INT NOT NULL,
@@ -47,13 +47,13 @@ CREATE TABLE `job_grades` (
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `job_grades` VALUES (1,'unemployed',0,'unemployed','Unemployed',200,'{}','{}');
+INSERT IGNORE INTO `job_grades` VALUES (1,'unemployed',0,'unemployed','Unemployed',200,'{}','{}');
 
-CREATE TABLE `jobs` (
+CREATE TABLE IF NOT EXISTS `jobs` (
 	`name` VARCHAR(50) NOT NULL,
 	`label` VARCHAR(50) DEFAULT NULL,
 
 	PRIMARY KEY (`name`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `jobs` VALUES ('unemployed','Unemployed');
+INSERT IGNORE INTO `jobs` VALUES ('unemployed','Unemployed');
