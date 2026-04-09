@@ -51,11 +51,9 @@ tasks:
     src: ./tmp/kiwi-esx/cfg
     dest: ./cfg
 
-  - action: write_file
+  - action: replace_string
     file: ./cfg/private.cfg
-    data: |
-      sv_licenseKey "{{svLicenseKey}}"
-      set mysql_connection_string "{{dbConnectionString}}"
+    mode: all_vars
 
   # ============================
   # DATABASE
