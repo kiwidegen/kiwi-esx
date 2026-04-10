@@ -1,28 +1,20 @@
 $engine: 3
 $onesync: on
 
-name: Kiwi ESX
+name: KiwiDegen ESX
 version: "1.0"
 author: kiwidegen
 description: >
   Modern ESX base with the full ox ecosystem.
-  Includes ox_lib, ox_inventory, ox_target, ox_fuel, ox_doorlock,
-  illenium-appearance, bob74_ipl, pma-voice, Renewed-Weathersync and screencapture.
-  Bring your own multichar - any resource that fires esx:onPlayerJoined will work.
 
 tasks:
 
-  # ============================
-  # CFX DEFAULT RESOURCES
-  # ============================
   - action: download_github
     src: https://github.com/citizenfx/cfx-server-data
     ref: master
     subpath: resources
     dest: ./resources/[cfx-default]
-  # ============================
-  # KIWI ESX BASE
-  # ============================
+ 
   - action: download_github
     src: https://github.com/kiwidegen/kiwi-esx
     ref: main
@@ -52,17 +44,11 @@ tasks:
     file: ./cfg/private.cfg
     mode: all_vars
 
-  # ============================
-  # DATABASE
-  # ============================
   - action: connect_database
 
   - action: query_database
     file: ./resources/[base]/es_extended/es_extended.sql
 
-  # ============================
-  # OX RESOURCES
-  # ============================
   - action: download_file
     url: https://github.com/CommunityOx/oxmysql/releases/latest/download/oxmysql.zip
     path: ./tmp/oxmysql.zip
@@ -110,9 +96,6 @@ tasks:
   - action: waste_time
     seconds: 5
 
-  # ============================
-  # STANDALONE / MISC
-  # ============================
   - action: download_github
     src: https://github.com/Bob74/bob74_ipl
     ref: master
@@ -139,9 +122,6 @@ tasks:
   - action: unzip
     src: ./tmp/screencapture.zip
     dest: ./resources/[standalone]/[misc]/
-
-  # ============================
-  # CLEANUP
-  # ============================
+    
   - action: remove_path
     path: ./tmp
