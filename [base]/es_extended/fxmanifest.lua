@@ -7,6 +7,7 @@ version '1.13.4'
 
 shared_scripts {
 	'locale.lua',
+	'@ox_lib/init.lua',
 
 	'shared/config/main.lua',
     'shared/config/weapons.lua',
