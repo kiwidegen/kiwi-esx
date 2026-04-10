@@ -1,10 +1,10 @@
-Config.DisableHealthRegeneration = false -- Player will no longer regenerate health
-Config.DisableVehicleRewards = false -- Disables Player Receiving weapons from vehicles
-Config.DisableNPCDrops = false -- stops NPCs from dropping weapons on death
+Config.DisableHealthRegeneration = true -- Player will no longer regenerate health
+Config.DisableVehicleRewards = true -- Disables Player Receiving weapons from vehicles
+Config.DisableNPCDrops = true -- stops NPCs from dropping weapons on death
 Config.DisableDispatchServices = true -- Disable Dispatch services
 Config.DisableScenarios = true -- Disable Scenarios
 Config.DisableAimAssist = false -- disables AIM assist (mainly on controllers)
-Config.DisableVehicleSeatShuff = false -- Disables vehicle seat shuff
+Config.DisableVehicleSeatShuff = true -- Disables vehicle seat shuff
 Config.DisableDisplayAmmo = false -- Disable ammunition display
 Config.EnablePVP = true -- Allow Player to player combat
 Config.EnableWantedLevel = false -- Use Normal GTA wanted Level?

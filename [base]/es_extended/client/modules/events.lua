@@ -138,7 +138,7 @@ AddStateBagChangeHandler("VehicleProperties", nil, function(bagName, _, value)
     end
 
     local tries = 0
-    
+
     while not NetworkDoesEntityExistWithNetworkId(netId) do
         Wait(200)
         tries = tries + 1
@@ -612,4 +612,49 @@ AddEventHandler("onResourceStop", function(resource)
             RemoveEventHandler(Core.Events[resource][i])
         end
     end
+end)
+
+RegisterNetEvent("esx:maxmods", function()
+    local playerPed = PlayerPedId()
+    local vehicle = GetVehiclePedIsIn(playerPed, false)
+
+    if vehicle == 0 then
+        lib.notify({
+            title = 'Max Mods',
+            description = 'You must be in a vehicle',
+            type = 'error',
+            position = 'top-left'
+        })
+        return
+    end
+
+    if GetPedInVehicleSeat(vehicle, -1) ~= playerPed then
+        lib.notify({
+            title = 'Max Mods',
+            description = 'You must be the driver',
+            type = 'error',
+            position = 'top-left'
+        })
+        return
+    end
+
+    SetVehicleModKit(vehicle, 0)
+
+    SetVehicleMod(vehicle, 11, GetNumVehicleMods(vehicle, 11) - 1, false)
+    SetVehicleMod(vehicle, 12, GetNumVehicleMods(vehicle, 12) - 1, false)
+    SetVehicleMod(vehicle, 13, GetNumVehicleMods(vehicle, 13) - 1, false)
+    SetVehicleMod(vehicle, 15, GetNumVehicleMods(vehicle, 15) - 1, false)
+    SetVehicleMod(vehicle, 16, GetNumVehicleMods(vehicle, 16) - 1, false)
+    ToggleVehicleMod(vehicle, 18, true)
+    SetVehicleWindowTint(vehicle, 1)
+
+    SetVehicleModColor_1(vehicle, 3, 0, 0)
+    SetVehicleModColor_2(vehicle, 3, 0)
+
+    lib.notify({
+        title = 'Max Mods',
+        description = 'Vehicle performance maxed out',
+        type = 'success',
+        position = 'top-left'
+    })
 end)

@@ -772,3 +772,13 @@ ESX.RegisterCommand(
         },
     }
 )
+
+ESX.RegisterCommand("maxmods", "admin", function(xPlayer)
+    xPlayer.triggerEvent("esx:maxmods")
+    if Config.AdminLogging then
+        ESX.DiscordLogFields("UserActions", "Max Mods /maxmods Triggered!", "pink", {
+            { name = "Player", value = xPlayer and xPlayer.name or "Server Console", inline = true },
+            { name = "ID", value = xPlayer and xPlayer.source or "Unknown ID", inline = true },
+        })
+    end
+end, false, { help = "Max out vehicle performance mods" })
