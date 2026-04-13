@@ -1,0 +1,93 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .compass-container {
+    position: absolute;
+    top: 10px !important;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 60px;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .label {
+    position: absolute;
+    color: rgb(255, 255, 255);
+    font-size: 12px;
+    bottom: 35px;
+    transform: translateX(-50%);
+    user-select: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .label.cardinal {
+    font-size: 12px;
+    font-weight: normal;
+    color: rgb(255, 255, 255);
+  }
+
+  .label.intercardinal {
+    font-size: 12px;
+    font-weight: normal;
+    color: rgb(255, 255, 255);
+  }
+
+  .bar {
+    position: absolute;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 1);
+    font-weight: normal;
+    bottom: 35px;
+    transform: translateX(-50%);
+    user-select: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .center-label {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 26px;
+    color: #fff; /* Pure white for degrees */
+    font-size: 28px;
+    font-weight: bold;
+    user-select: none;
+    width: 60px;
+    text-align: center;
+  }
+
+  .center-label.intercardinal {
+    font-size: 28px;
+    color: #fff; /* Pure white for intercardinal directions */
+  }
+
+  .center-label.degree {
+    font-size: 28px;
+    color: #fff; /* Pure white for degree numbers */
+  }
+
+  .street-info {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 12px;
+    color: #e5ff00;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Arial', sans-serif;
+    user-select: none;
+    text-align: center;
+    width: 100%;
+  }
+
+  .hidden {
+    display: none;
+  }

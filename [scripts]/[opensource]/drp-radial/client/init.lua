@@ -1,0 +1,4 @@
+-- client/init.lua
+-- The radial menu is automatically handled by ox_lib
+-- All radial items are registered in the other client files (clothing.lua, vehicle.lua, general.lua, emotes.lua, elevator.lua)
+-- ox_lib handles the keybind internally - check your ox_lib settings to configure the radial menu key

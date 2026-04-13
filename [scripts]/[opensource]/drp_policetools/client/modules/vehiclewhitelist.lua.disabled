@@ -1,0 +1,141 @@
+-- client/modules/vehiclewhitelist.lua
+local VehicleWhitelistModule = {}
+
+local isInPoliceVehicle = false
+local currentVehicle = nil
+local hasAccess = true
+local isMonitoringControls = false
+
+--- Check if a vehicle is a police vehicle
+---@param vehicle number The vehicle entity
+---@return boolean isPoliceVehicle Whether the vehicle is a police vehicle
+local function IsPoliceVehicle(vehicle)
+  local model = GetEntityModel(vehicle)
+  local modelName = GetDisplayNameFromVehicleModel(model):lower()
+
+  for _, policeModel in ipairs(Config.PoliceVehicles.Model) do
+    if modelName == policeModel:lower() or GetHashKey(policeModel) == model then
+      return true
+    end
+  end
+  return false
+end
+
+--- Start engine disabler only when needed
+local function startEngineDisabler()
+  if isMonitoringControls then return end
+  isMonitoringControls = true
+
+  CreateThread(function()
+    while isMonitoringControls do
+      Wait(0)
+
+      -- Only disable if in police vehicle AND doesn't have access
+      if isInPoliceVehicle and not hasAccess then
+        local ped = PlayerPedId()
+        if IsPedInAnyVehicle(ped, false) then
+          DisableControlAction(0, 71, true) -- Accelerate
+          DisableControlAction(0, 72, true) -- Brake/Reverse
+        else
+          isMonitoringControls = false
+        end
+      else
+        isMonitoringControls = false
+      end
+    end
+  end)
+end
+
+--- Handle access response from server
+RegisterNetEvent('drp_policetools:vehiclewhitelist:accessResponse', function(allowed, vehicle)
+  hasAccess = allowed
+
+  if not allowed and DoesEntityExist(vehicle) then
+    local ped = PlayerPedId()
+    SetVehicleEngineOn(vehicle, false, true, true)
+
+    -- Start controlling only when unauthorized
+    startEngineDisabler()
+
+    Wait(Config.PoliceVehicles.EjectDelay)
+    TaskLeaveVehicle(ped, vehicle, 16)
+
+    lib.notify({
+      title = 'Access Denied',
+      description = 'You are not authorized to use police vehicles',
+      type = 'error'
+    })
+  end
+end)
+
+--- Monitor vehicle entry using game events
+AddEventHandler('gameEventTriggered', function(event, data)
+  -- Only check on vehicle enter event
+  if event == 'CEventNetworkPlayerEnteredVehicle' or event == 'CEventNetworkPlayerJackVehicle' then
+    local ped = data[1]
+
+    if ped == PlayerPedId() then
+      local vehicle = data[2]
+
+      if vehicle ~= currentVehicle and DoesEntityExist(vehicle) then
+        currentVehicle = vehicle
+        hasAccess = true -- Reset access on vehicle change
+        isInPoliceVehicle = false
+
+        if IsPoliceVehicle(vehicle) then
+          local seat = -1
+          for i = -1, 15 do
+            if GetPedInVehicleSeat(vehicle, i) == ped then
+              seat = i
+              break
+            end
+          end
+
+          if seat == -1 then -- Driver seat
+            isInPoliceVehicle = true
+            TriggerServerEvent('drp_policetools:vehiclewhitelist:checkAccess', vehicle)
+          end
+        end
+      end
+    end
+  end
+end)
+
+--- Fallback light monitor only when in vehicle (event system backup)
+local function startLightVehicleMonitor()
+  CreateThread(function()
+    while true do
+      Wait(500) -- Much slower check, only as backup
+
+      local ped = PlayerPedId()
+
+      if not IsPedInAnyVehicle(ped, false) then
+        if currentVehicle then
+          currentVehicle = nil
+          isInPoliceVehicle = false
+          hasAccess = true
+          isMonitoringControls = false
+        end
+      end
+    end
+  end)
+end
+
+--- Module callbacks
+function VehicleWhitelistModule.OnResourceStart()
+  startLightVehicleMonitor()
+end
+
+function VehicleWhitelistModule.OnPlayerLoaded()
+  startLightVehicleMonitor()
+end
+
+function VehicleWhitelistModule.OnResourceStop()
+  isInPoliceVehicle = false
+  currentVehicle = nil
+  hasAccess = true
+  isMonitoringControls = false
+end
+
+-- Register the module
+RegisterPoliceModule('vehiclewhitelist', VehicleWhitelistModule)

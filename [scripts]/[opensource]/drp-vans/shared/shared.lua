@@ -1,0 +1,3 @@
+-- keep the linter happy without colliding with other stubs
+---@alias vector3 table
+---@alias vector4 table

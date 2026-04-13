@@ -1,0 +1,99 @@
+-- server/modules/vehiclewhitelist.lua
+local VehicleWhitelistModule = {}
+
+local whitelist = {}
+
+--- Check if a player is whitelisted for police vehicles
+---@param source number The player source
+---@return boolean isWhitelisted Whether the player is whitelisted
+local function IsPlayerWhitelisted(source)
+  if IsPolice(source) then
+    return true
+  end
+
+  local xPlayer = ESX.GetPlayerFromId(source)
+  if not xPlayer then
+    return false
+  end
+
+  local identifier = xPlayer.getIdentifier()
+  return whitelist[identifier] ~= nil
+end
+
+--- Handle vehicle access check from client
+RegisterNetEvent('drp_policetools:vehiclewhitelist:checkAccess', function(vehicle)
+  local source = source
+  local hasAccess = IsPlayerWhitelisted(source)
+
+  TriggerClientEvent('drp_policetools:vehiclewhitelist:accessResponse', source, hasAccess, vehicle)
+end)
+
+--- Admin command to manage police vehicle whitelist
+RegisterCommand('police_whitelist', function(source, args, rawCommand)
+  if source == 0 or IsPlayerAceAllowed(source, 'command.police_whitelist') then
+    if #args < 2 then
+      local msg = 'Usage: police_whitelist <add|remove> <identifier>'
+      if source == 0 then
+        print(msg)
+      else
+        TriggerClientEvent('ox_lib:notify', source, {
+          title = 'Police Whitelist',
+          description = msg,
+          type = 'error'
+        })
+      end
+      return
+    end
+
+    local action = args[1]:lower()
+    local identifier = args[2]
+
+    if action == 'add' then
+      whitelist[identifier] = true
+      local msg = ('Added %s to police vehicle whitelist'):format(identifier)
+      if source == 0 then
+        print('[DRP Police Tools] ' .. msg)
+      else
+        TriggerClientEvent('ox_lib:notify', source, {
+          title = 'Police Whitelist',
+          description = msg,
+          type = 'success'
+        })
+      end
+    elseif action == 'remove' then
+      whitelist[identifier] = nil
+      local msg = ('Removed %s from police vehicle whitelist'):format(identifier)
+      if source == 0 then
+        print('[DRP Police Tools] ' .. msg)
+      else
+        TriggerClientEvent('ox_lib:notify', source, {
+          title = 'Police Whitelist',
+          description = msg,
+          type = 'success'
+        })
+      end
+    else
+      local msg = 'Invalid action. Use add or remove'
+      if source == 0 then
+        print('[DRP Police Tools] ' .. msg)
+      else
+        TriggerClientEvent('ox_lib:notify', source, {
+          title = 'Police Whitelist',
+          description = msg,
+          type = 'error'
+        })
+      end
+    end
+  end
+end, false)
+
+--- Module initialization
+function VehicleWhitelistModule.Init()
+  print('[DRP Police Tools] Vehicle Whitelist module loaded')
+end
+
+-- Register the module
+RegisterPoliceModule('vehiclewhitelist', VehicleWhitelistModule)
+
+-- Initialize
+VehicleWhitelistModule.Init()
