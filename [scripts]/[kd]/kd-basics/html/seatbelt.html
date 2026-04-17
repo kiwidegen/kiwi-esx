@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>
+        window.addEventListener('message', function(event) {
+            if (event.data.action === 'play') {
+                const audio = new Audio('nui://kd-basics/audiodirectory/seatbelt_sounds/' + event.data.sound + '_left.wav');
+                audio.volume = event.data.volume || 0.25;
+                audio.play();
+            }
+        });
+    </script>
+</head>
+<body></body>
+</html>

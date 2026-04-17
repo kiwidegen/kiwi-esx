@@ -33,6 +33,10 @@ tasks:
     dest: ./resources/[scripts]
 
   - action: move_path
+    src: ./tmp/kiwi-esx/[ox]
+    dest: ./resources/[ox]
+
+  - action: move_path
     src: ./tmp/kiwi-esx/cfg/server.cfg
     dest: ./server.cfg
 
@@ -64,13 +68,6 @@ tasks:
     dest: ./resources/[ox]/
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_inventory/releases/latest/download/ox_inventory.zip
-    path: ./tmp/ox_inventory.zip
-  - action: unzip
-    src: ./tmp/ox_inventory.zip
-    dest: ./resources/[ox]/
-
-  - action: download_file
     url: https://github.com/CommunityOx/ox_target/releases/latest/download/ox_target.zip
     path: ./tmp/ox_target.zip
   - action: unzip
@@ -92,6 +89,11 @@ tasks:
     dest: ./resources/[ox]/
   - action: query_database
     file: ./resources/[ox]/ox_doorlock/sql/ox_doorlock.sql
+
+  - action: download_github
+    src: https://github.com/Byte-Labs-Studio/bl_bridge
+    ref: main
+    dest: ./resources/[standalone]/[bridges]/bl_bridge
 
   - action: waste_time
     seconds: 5
@@ -115,6 +117,13 @@ tasks:
     file: ./resources/[standalone]/[misc]/illenium-appearance/sql/management_outfits.sql
   - action: query_database
     file: ./resources/[standalone]/[misc]/illenium-appearance/sql/playerskins.sql
+
+  - action: download_file
+    url: https://github.com/Byte-Labs-Studio/bl_ui/releases/download/v2.1.0/bl_ui.zip
+    path: ./tmp/bl_ui.zip
+  - action: unzip
+    src: ./tmp/bl_ui.zip
+    dest: ./resources/[standalone]/[misc]/
 
   - action: download_file
     url: https://github.com/itschip/screencapture/releases/latest/download/screencapture.zip
