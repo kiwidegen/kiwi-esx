@@ -54,7 +54,7 @@ tasks:
     file: ./resources/[base]/es_extended/es_extended.sql
 
   - action: download_file
-    url: https://github.com/CommunityOx/oxmysql/releases/latest/download/oxmysql.zip
+    url: https://github.com/CommunityOx/oxmysql/releases/download/v2.12.3/oxmysql.zip
     path: ./tmp/oxmysql.zip
   - action: unzip
     src: ./tmp/oxmysql.zip
@@ -133,7 +133,7 @@ tasks:
     dest: ./resources/[standalone]/[misc]/
 
   - action: download_file
-    url: https://github.com/itschip/screencapture/releases/latest/download/screencapture.zip
+    url: https://github.com/itschip/screencapture/releases/download/v1.0.0-preview-0.0.2/screencapture.zip
     path: ./tmp/screencapture.zip
   - action: unzip
     src: ./tmp/screencapture.zip
