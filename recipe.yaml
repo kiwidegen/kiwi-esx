@@ -130,7 +130,7 @@ tasks:
     path: ./tmp/bl_ui.zip
   - action: unzip
     src: ./tmp/bl_ui.zip
-    dest: ./resources/[standalone]/[bridges]/
+    dest: ./resources/[standalone]/[misc]/
 
   - action: download_file
     url: https://github.com/itschip/screencapture/releases/latest/download/screencapture.zip
