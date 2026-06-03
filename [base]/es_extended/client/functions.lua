@@ -48,26 +48,17 @@ end
 ---@param count? boolean Whether to return the count of the item as well
 ---@return table | number
 function ESX.SearchInventory(items, count)
-    local item
     if type(items) == 'string' then
-        item, items = items, {items}
+        local result = exports.ox_inventory:Search('count', items)
+        return count and (result or 0) or result
     end
 
     local data = {}
-    for i = 1, #ESX.PlayerData.inventory do
-        local e = ESX.PlayerData.inventory[i]
-        for ii = 1, #items do
-            if e.name == items[ii] then
-                data[table.remove(items, ii)] = count and e.count or e
-                break
-            end
-        end
-        if #items == 0 then
-            break
-        end
+    for i = 1, #items do
+        local result = exports.ox_inventory:Search('count', items[i])
+        data[items[i]] = count and (result or 0) or result
     end
-
-    return not item and data or data[item]
+    return data
 end
 
 ---@param key string Table key to set
@@ -76,10 +67,8 @@ end
 function ESX.SetPlayerData(key, val)
     local current = ESX.PlayerData[key]
     ESX.PlayerData[key] = val
-    if key ~= "loadout" then
-        if type(val) == "table" or val ~= current then
-            TriggerEvent("esx:setPlayerData", key, val, current)
-        end
+    if type(val) == "table" or val ~= current then
+        TriggerEvent("esx:setPlayerData", key, val, current)
     end
 end
 
@@ -98,17 +87,10 @@ function Core.FreezePlayer(freeze)
     end
 end
 
----@param skin table Skin data to set
 ---@param coords table Coords to spawn the player at
 ---@param cb function Callback function
 ---@return nil
-function ESX.SpawnPlayer(skin, coords, cb)
-    local p = promise.new()
-    TriggerEvent("skinchanger:loadSkin", skin, function()
-        p:resolve()
-    end)
-    Citizen.Await(p)
-
+function ESX.SpawnPlayer(coords, cb)
     RequestCollisionAtCoord(coords.x, coords.y, coords.z)
 
     local playerPed = PlayerPedId()
@@ -477,19 +459,6 @@ function ESX.UI.Menu.GetOpenedMenus()
 end
 
 ESX.UI.Menu.IsOpen = ESX.UI.Menu.GetOpened
-
----@param add boolean Whether the item is being added or removed
----@param item string The item to show
----@param count number How many of the item to show
----@return nil
-function ESX.UI.ShowInventoryItemNotification(add, item, count)
-    SendNUIMessage({
-        action = "inventoryNotification",
-        add = add,
-        item = item,
-        count = count,
-    })
-end
 
 ---@param ped integer The ped to get the mugshot of
 ---@param transparent? boolean Whether the mugshot should be transparent

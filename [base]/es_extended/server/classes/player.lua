@@ -28,20 +28,6 @@
 ---@field skin_female table         # Skin configuration for female characters.
 ---@field onDuty boolean?           # Whether the player is currently on duty.
 
----@class ESXWeapon
----@field name string               # Weapon identifier (internal name).
----@field label string              # Weapon display name.
-
----@class ESXInventoryWeapon:ESXWeapon
----@field ammo number               # Amount of ammo in the weapon.
----@field components string[]       # List of components attached to the weapon.
----@field tintIndex number          # Current weapon tint index.
-
----@class ESXWeaponComponent
----@field name string               # Component identifier (internal name).
----@field label string              # Component display name.
----@field hash string|number        # Component hash or identifier.
-
 ---@class StaticPlayer
 ---@field src number                                              # Player's server ID.
 --- Money Functions
@@ -54,37 +40,17 @@
 ---@field removeAccountMoney fun(accountName: string, money: number, reason?: string) # Remove money from an account.
 ---@field getAccount fun(account: string): ESXAccount?            # Get account data by name.
 ---@field getAccounts fun(minimal?: boolean): ESXAccount[]|table<string,number>  # Get all accounts, optionally minimal.
---- Inventory Functions
----@field getInventory fun(minimal?: boolean): ESXInventoryItem[]|table<string,number>  # Get inventory, optionally minimal.
----@field getInventoryItem fun(itemName: string): ESXInventoryItem? # Get a specific item from inventory.
+--- Inventory Functions (proxied to ox_inventory)
+---@field getInventoryItem fun(itemName: string): table? # Get a specific item from inventory.
 ---@field addInventoryItem fun(itemName: string, count: number)     # Add items to inventory.
 ---@field removeInventoryItem fun(itemName: string, count: number)  # Remove items from inventory.
----@field setInventoryItem fun(itemName: string, count: number)     # Set item count in inventory.
----@field getWeight fun(): number                                   # Get current carried weight.
----@field getMaxWeight fun(): number                                # Get maximum carry weight.
----@field setMaxWeight fun(newWeight: number)                       # Set maximum carry weight.
+---@field hasItem fun(item: string, count?: number): table|false    # Check if player has an item.
 ---@field canCarryItem fun(itemName: string, count: number): boolean # Check if player can carry more of an item.
----@field canSwapItem fun(firstItem: string, firstItemCount: number, testItem: string, testItemCount: number): boolean # Check if items can be swapped.
----@field hasItem fun(item: string): ESXInventoryItem|false, number? # Check if player has an item.
----@field getLoadout fun(minimal?: boolean): ESXInventoryWeapon[]|table<string, {ammo:number, tintIndex?:number, components?:string[]}> # Get player's weapon loadout.
 --- Job Functions
 ---@field getJob fun(): ESXJob                                         # Get player's current job.
 ---@field setJob fun(newJob: string, grade: string, onDuty?: boolean)  # Set player's job and grade.
 ---@field setGroup fun(newGroup: string)                               # Set player's permission group.
 ---@field getGroup fun(): string                                       # Get player's permission group.
---- Weapon Functions
----@field addWeapon fun(weaponName: string, ammo: number)                 # Give player a weapon.
----@field removeWeapon fun(weaponName: string)                             # Remove weapon from player.
----@field hasWeapon fun(weaponName: string): boolean                       # Check if player has a weapon.
----@field getWeapon fun(weaponName: string): number?, table?               # Get weapon ammo & components.
----@field addWeaponAmmo fun(weaponName: string, ammoCount: number)        # Add ammo to a weapon.
----@field removeWeaponAmmo fun(weaponName: string, ammoCount: number)     # Remove ammo from a weapon.
----@field updateWeaponAmmo fun(weaponName: string, ammoCount: number)     # Update ammo count for a weapon.
----@field addWeaponComponent fun(weaponName: string, weaponComponent: string)    # Add component to weapon.
----@field removeWeaponComponent fun(weaponName: string, weaponComponent: string) # Remove component from weapon.
----@field hasWeaponComponent fun(weaponName: string, weaponComponent: string): boolean # Check if weapon has component.
----@field setWeaponTint fun(weaponName: string, weaponTintIndex: number) # Set weapon tint.
----@field getWeaponTint fun(weaponName: string): number                  # Get weapon tint.
 --- Player State Functions
 ---@field getIdentifier fun(): string                              # Get player's unique identifier.
 ---@field getSSN fun(): string                                      # Get player's social security number.
@@ -121,15 +87,11 @@
 ---@field group string              # Player permission group.
 ---@field identifier string         # Unique identifier (usually Steam or license).
 ---@field license string            # Player license string.
----@field inventory ESXInventoryItem[] # Player's inventory items.
 ---@field job ESXJob                # Player's current job.
----@field loadout ESXInventoryWeapon[] # Player's current weapons.
 ---@field name string               # Player's display name.
 ---@field playerId number           # Player's ID (server ID).
 ---@field source number             # Player's source (alias for playerId).
 ---@field variables table           # Custom player variables.
----@field weight number             # Current carried weight.
----@field maxWeight number          # Maximum carry weight.
 ---@field metadata table            # Custom metadata table.
 ---@field lastPlaytime number       # Last recorded playtime in seconds.
 ---@field paycheckEnabled boolean   # Whether paycheck is enabled.
@@ -140,15 +102,12 @@
 ---@param ssn string
 ---@param group string
 ---@param accounts ESXAccount[]
----@param inventory table
----@param weight number
 ---@param job ESXJob
----@param loadout ESXInventoryWeapon[]
 ---@param name string
 ---@param coords vector4|{x: number, y: number, z: number, heading: number}
 ---@param metadata table
 ---@return xPlayer
-function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, inventory, weight, job, loadout, name, coords, metadata)
+function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, job, name, coords, metadata)
     ---@diagnostic disable-next-line: missing-fields
     local self = {} ---@type xPlayer
 
@@ -157,15 +116,11 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, invent
     self.group = group
     self.identifier = identifier
     self.ssn = ssn
-    self.inventory = inventory
     self.job = job
-    self.loadout = loadout
     self.name = name
     self.playerId = playerId
     self.source = playerId
     self.variables = {}
-    self.weight = weight
-    self.maxWeight = Config.MaxWeight
     self.metadata = metadata
     self.lastPlaytime = self.metadata.lastPlaytime or 0
     self.paycheckEnabled = true
@@ -325,54 +280,8 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, invent
         return nil
     end
 
-    function self.getInventory(minimal)
-        if minimal then
-            local minimalInventory = {}
-
-            for _, v in ipairs(self.inventory) do
-                if v.count > 0 then
-                    minimalInventory[v.name] = v.count
-                end
-            end
-
-            return minimalInventory
-        end
-
-        return self.inventory
-    end
-
     function self.getJob()
         return self.job
-    end
-
-    function self.getLoadout(minimal)
-        if not minimal then
-            return self.loadout
-        end
-        local minimalLoadout = {}
-
-        for _, v in ipairs(self.loadout) do
-            minimalLoadout[v.name] = { ammo = v.ammo }
-            if v.tintIndex > 0 then
-                minimalLoadout[v.name].tintIndex = v.tintIndex
-            end
-
-            if #v.components > 0 then
-                local components = {}
-
-                for _, component in ipairs(v.components) do
-                    if component ~= "clip_default" then
-                        components[#components + 1] = component
-                    end
-                end
-
-                if #components > 0 then
-                    minimalLoadout[v.name].components = components
-                end
-            end
-        end
-
-        return minimalLoadout
     end
 
     function self.getName()
@@ -457,111 +366,34 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, invent
     end
 
     function self.getInventoryItem(itemName)
-        for _, v in ipairs(self.inventory) do
-            if v.name == itemName then
-                return v
-            end
-        end
-        return nil
+        return exports.ox_inventory:GetItem(self.source, itemName, nil, false)
     end
 
     function self.addInventoryItem(itemName, count)
-        local item = self.getInventoryItem(itemName)
-
-        if item then
-            count = ESX.Math.Round(count)
-            item.count = item.count + count
-            self.weight = self.weight + (item.weight * count)
-
-            TriggerEvent("esx:onAddInventoryItem", self.source, item.name, item.count)
-            self.triggerEvent("esx:addInventoryItem", item.name, item.count)
-        end
+        exports.ox_inventory:AddItem(self.source, itemName, count)
+        TriggerEvent("esx:onAddInventoryItem", self.source, itemName, count)
     end
 
     function self.removeInventoryItem(itemName, count)
-        local item = self.getInventoryItem(itemName)
-
-        if item then
-            count = ESX.Math.Round(count)
-            if count > 0 then
-                local newCount = item.count - count
-
-                if newCount >= 0 then
-                    item.count = newCount
-                    self.weight = self.weight - (item.weight * count)
-
-                    TriggerEvent("esx:onRemoveInventoryItem", self.source, item.name, item.count)
-                    self.triggerEvent("esx:removeInventoryItem", item.name, item.count)
-                end
-            else
-                error(("Player ID:^5%s Tried remove a Invalid count -> %s of %s"):format(self.playerId, count, itemName))
-            end
-        end
+        exports.ox_inventory:RemoveItem(self.source, itemName, count)
+        TriggerEvent("esx:onRemoveInventoryItem", self.source, itemName, count)
     end
 
-    function self.setInventoryItem(itemName, count)
-        local item = self.getInventoryItem(itemName)
-
-        if item and count >= 0 then
-            count = ESX.Math.Round(count)
-
-            if count > item.count then
-                self.addInventoryItem(item.name, count - item.count)
-            else
-                self.removeInventoryItem(item.name, item.count - count)
-            end
-        end
+    function self.hasItem(itemName, count)
+        local item = exports.ox_inventory:GetItem(self.source, itemName, nil, false)
+        if not item or item.count < 1 then return false end
+        if count and item.count < count then return false end
+        return item
     end
 
-    function self.getWeight()
-        return self.weight
+    function self.canCarryItem(itemName, count)
+        return exports.ox_inventory:CanCarryItem(self.source, itemName, count)
     end
 
     function self.getSource()
         return self.source
     end
     self.getPlayerId = self.getSource
-
-    function self.getMaxWeight()
-        return self.maxWeight
-    end
-
-    function self.canCarryItem(itemName, count)
-        if ESX.Items[itemName] then
-            local currentWeight, itemWeight = self.weight, ESX.Items[itemName].weight
-            local newWeight = currentWeight + (itemWeight * count)
-
-            return newWeight <= self.maxWeight
-        else
-            print(('[^3WARNING^7] Item ^5"%s"^7 was used but does not exist!'):format(itemName))
-            return false
-        end
-    end
-
-    function self.canSwapItem(firstItem, firstItemCount, testItem, testItemCount)
-        local firstItemObject = self.getInventoryItem(firstItem)
-        if not firstItemObject then
-            return false
-        end
-        local testItemObject = self.getInventoryItem(testItem)
-        if not testItemObject then
-            return false
-        end
-
-        if firstItemObject.count >= firstItemCount then
-            local weightWithoutFirstItem = ESX.Math.Round(self.weight - (firstItemObject.weight * firstItemCount))
-            local weightWithTestItem = ESX.Math.Round(weightWithoutFirstItem + (testItemObject.weight * testItemCount))
-
-            return weightWithTestItem <= self.maxWeight
-        end
-
-        return false
-    end
-
-    function self.setMaxWeight(newWeight)
-        self.maxWeight = newWeight
-        self.triggerEvent("esx:setMaxWeight", self.maxWeight)
-    end
 
     function self.setJob(newJob, grade, onDuty)
         grade = tostring(grade)
@@ -593,206 +425,12 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, invent
             grade_label = gradeObject.label,
             grade_salary = gradeObject.salary,
 
-            skin_male = gradeObject.skin_male and json.decode(gradeObject.skin_male) or {},
-            skin_female = gradeObject.skin_female and json.decode(gradeObject.skin_female) or {},
         }
 
         self.metadata.jobDuty = onDuty
         TriggerEvent("esx:setJob", self.source, self.job, lastJob)
         self.triggerEvent("esx:setJob", self.job, lastJob)
         Player(self.source).state:set("job", self.job, true)
-    end
-
-    function self.addWeapon(weaponName, ammo)
-        if not self.hasWeapon(weaponName) then
-            local weaponLabel <const> = ESX.GetWeaponLabel(weaponName)
-
-            table.insert(self.loadout, {
-                name = weaponName,
-                ammo = ammo,
-                label = weaponLabel,
-                components = {},
-                tintIndex = 0,
-            })
-
-            GiveWeaponToPed(GetPlayerPed(self.source), joaat(weaponName), ammo, false, false)
-            self.triggerEvent("esx:addInventoryItem", weaponLabel, false, true)
-            self.triggerEvent("esx:addLoadoutItem", weaponName, weaponLabel, ammo)
-        end
-    end
-
-    function self.addWeaponComponent(weaponName, weaponComponent)
-        local loadoutNum <const>, weapon <const> = self.getWeapon(weaponName)
-
-        if weapon then
-            local component = ESX.GetWeaponComponent(weaponName, weaponComponent)
-
-            if component then
-                if not self.hasWeaponComponent(weaponName, weaponComponent) then
-                    self.loadout[loadoutNum].components[#self.loadout[loadoutNum].components + 1] = weaponComponent
-                    local componentHash = ESX.GetWeaponComponent(weaponName, weaponComponent).hash
-                    GiveWeaponComponentToPed(GetPlayerPed(self.source), joaat(weaponName), componentHash)
-                    self.triggerEvent("esx:addInventoryItem", component.label, false, true)
-                end
-            end
-        end
-    end
-
-    function self.addWeaponAmmo(weaponName, ammoCount)
-        local _, weapon = self.getWeapon(weaponName)
-
-        if weapon then
-            weapon.ammo = weapon.ammo + ammoCount
-            SetPedAmmo(GetPlayerPed(self.source), joaat(weaponName), weapon.ammo)
-        end
-    end
-
-    function self.updateWeaponAmmo(weaponName, ammoCount)
-        local _, weapon = self.getWeapon(weaponName)
-
-        if not weapon then
-            return
-        end
-
-        weapon.ammo = ammoCount
-
-        if weapon.ammo <= 0 then
-            local _, weaponConfig = ESX.GetWeapon(weaponName)
-            if weaponConfig.throwable then
-                self.removeWeapon(weaponName)
-            end
-        end
-    end
-
-    function self.setWeaponTint(weaponName, weaponTintIndex)
-        local loadoutNum <const>, weapon <const> = self.getWeapon(weaponName)
-
-        if weapon then
-            local _, weaponObject <const> = ESX.GetWeapon(weaponName)
-
-            if weaponObject.tints and weaponObject.tints[weaponTintIndex] then
-                self.loadout[loadoutNum].tintIndex = weaponTintIndex
-                self.triggerEvent("esx:setWeaponTint", weaponName, weaponTintIndex)
-                self.triggerEvent("esx:addInventoryItem", weaponObject.tints[weaponTintIndex], false, true)
-            end
-        end
-    end
-
-    function self.getWeaponTint(weaponName)
-        local _, weapon <const> = self.getWeapon(weaponName)
-
-        if weapon then
-            return weapon.tintIndex
-        end
-
-        return 0
-    end
-
-    function self.removeWeapon(weaponName)
-        local weaponLabel, playerPed <const> = nil, GetPlayerPed(self.source)
-
-        if not playerPed then
-            return error("xPlayer.removeWeapon ^5invalid^1 player ped!")
-        end
-
-        for k, v in ipairs(self.loadout) do
-            if v.name == weaponName then
-                weaponLabel = v.label
-
-                for _, v2 in ipairs(v.components) do
-                    self.removeWeaponComponent(weaponName, v2)
-                end
-
-                local weaponHash = joaat(v.name)
-                RemoveWeaponFromPed(playerPed, weaponHash)
-                SetPedAmmo(playerPed, weaponHash, 0)
-
-                table.remove(self.loadout, k)
-                break
-            end
-        end
-
-        if weaponLabel then
-            self.triggerEvent("esx:removeInventoryItem", weaponLabel, false, true)
-            self.triggerEvent("esx:removeLoadoutItem", weaponName, weaponLabel)
-        end
-    end
-
-    function self.removeWeaponComponent(weaponName, weaponComponent)
-        local loadoutNum <const>, weapon <const> = self.getWeapon(weaponName)
-
-        if weapon then
-            local component <const> = ESX.GetWeaponComponent(weaponName, weaponComponent)
-
-            if component then
-                if self.hasWeaponComponent(weaponName, weaponComponent) then
-                    for k, v in ipairs(self.loadout[loadoutNum].components) do
-                        if v == weaponComponent then
-                            table.remove(self.loadout[loadoutNum].components, k)
-                            break
-                        end
-                    end
-
-                    self.triggerEvent("esx:removeWeaponComponent", weaponName, weaponComponent)
-                    self.triggerEvent("esx:removeInventoryItem", component.label, false, true)
-                end
-            end
-        end
-    end
-
-    function self.removeWeaponAmmo(weaponName, ammoCount)
-        local _, weapon = self.getWeapon(weaponName)
-
-        if weapon then
-            weapon.ammo = weapon.ammo - ammoCount
-            SetPedAmmo(GetPlayerPed(self.source), joaat(weaponName), weapon.ammo)
-        end
-    end
-
-    function self.hasWeaponComponent(weaponName, weaponComponent)
-        local _, weapon <const> = self.getWeapon(weaponName)
-
-        if weapon then
-            for _, v in ipairs(weapon.components) do
-                if v == weaponComponent then
-                    return true
-                end
-            end
-
-            return false
-        end
-
-        return false
-    end
-
-    function self.hasWeapon(weaponName)
-        for _, v in ipairs(self.loadout) do
-            if v.name == weaponName then
-                return true
-            end
-        end
-
-        return false
-    end
-
-    function self.hasItem(item)
-        for _, v in ipairs(self.inventory) do
-            if v.name == item and v.count >= 1 then
-                return v, v.count
-            end
-        end
-
-        return false
-    end
-
-    function self.getWeapon(weaponName)
-        for k, v in ipairs(self.loadout) do
-            if v.name == weaponName then
-                return k, v
-            end
-        end
-
-        return nil, nil
     end
 
     function self.showNotification(msg, notifyType, length, title, position)

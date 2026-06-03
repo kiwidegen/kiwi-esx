@@ -4,9 +4,6 @@ local txAdminLocale = GetConvar("txAdmin-locale", "en")
 local esxLocale = GetConvar("esx:locale", "invalid")
 Config.Locale = (esxLocale ~= "invalid") and esxLocale or (txAdminLocale ~= "custom" and txAdminLocale) or "en"
 
--- For ox inventory, this will automatically be adjusted, do not change! For other inventories, leave as false unless specifically instructed to change.
-Config.CustomInventory = false
-
 Config.Accounts = {
     bank = {
         label = TranslateCap("account_bank"),
@@ -50,7 +47,6 @@ Config.ValidCharacterSets = { -- Only enable additional charsets if your server 
 Config.EnablePaycheck = true -- enable paycheck
 Config.LogPaycheck = false -- Logs paychecks to a nominated Discord channel via webhook (default is false)
 Config.EnableSocietyPayouts = false -- pay from the society account that the player is employed at? Requirement: esx_society
-Config.MaxWeight = 24 -- the max inventory weight without a backpack
 Config.PaycheckInterval = 7 * 60000 -- how often to receive paychecks in milliseconds
 Config.SaveDeathStatus = true -- Save the death status of a player
 Config.EnableDebug = false -- Use Debug options?
@@ -64,12 +60,4 @@ Config.DistanceGive = 4.0 -- Max distance when giving items, weapons etc.
 
 Config.AdminLogging = false -- Logs the usage of certain commands by those with group.admin ace permissions (default is false)
 
--------------------------------------
--- DO NOT CHANGE BELOW THIS LINE !!!
--------------------------------------
-if GetResourceState("ox_inventory") ~= "missing" then
-    Config.CustomInventory = "ox"
-end
-
-Config.EnableDefaultInventory = Config.CustomInventory == false -- Display the default Inventory ( F2 )
 Config.Identifier = GetConvar("esx:identifier", "license")

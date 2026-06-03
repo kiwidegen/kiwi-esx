@@ -10,7 +10,6 @@ shared_scripts {
 	'@ox_lib/init.lua',
 
 	'shared/config/main.lua',
-    'shared/config/weapons.lua',
     'shared/config/adjustments.lua',
 
     'shared/main.lua',
@@ -28,23 +27,18 @@ server_scripts {
 	'server/modules/callback.lua',
 	'server/classes/player.lua',
 	'server/classes/vehicle.lua',
-	'server/classes/overrides/*.lua',
 	'server/modules/onesync.lua',
 	'server/modules/paycheck.lua',
 
 	'server/main.lua',
 	'server/modules/commands.lua',
 
-	'server/bridge/**/*.lua',
 	'server/modules/createJob.lua',
-	'server/migration/**/main.lua',
-	'server/migration/main.lua',
 }
 
 client_scripts {
     'client/main.lua',
 	'client/functions.lua',
-	'client/modules/wrapper.lua',
 	'client/modules/callback.lua',
     'client/modules/adjustments.lua',
 	'client/modules/points.lua',
@@ -58,25 +52,10 @@ client_scripts {
 	'client/modules/streaming.lua',
 }
 
-ui_page {
-	'html/ui.html'
-}
-
 files {
 	'imports.lua',
 	'locales/*.lua',
 	'locale.js',
-	'html/ui.html',
-
-	'html/css/app.css',
-
-	'html/js/mustache.min.js',
-	'html/js/wrapper.js',
-	'html/js/app.js',
-
-	'html/fonts/pdown.ttf',
-	'html/fonts/bankgothic.ttf',
-    "client/imports/*.lua",
 }
 
 dependencies {
@@ -84,4 +63,6 @@ dependencies {
     '/native:0xA61C8FC6',
 	'oxmysql',
 	'ox_lib',
+	'ox_inventory',
+	'illenium-appearance',
 }

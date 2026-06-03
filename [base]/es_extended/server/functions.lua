@@ -116,16 +116,10 @@ function ESX.RegisterCommand(name, group, cb, allowConsole, suggestion)
                                     err = TranslateCap("commanderror_argumentmismatch_string", k)
                                 end
                             elseif v.type == "item" then
-                                if ESX.Items[args[k]] then
+                                if exports.ox_inventory:GetItem(args[k]) then
                                     newArgs[v.name] = args[k]
                                 else
                                     err = TranslateCap("commanderror_invaliditem")
-                                end
-                            elseif v.type == "weapon" then
-                                if ESX.GetWeapon(args[k]) then
-                                    newArgs[v.name] = string.upper(args[k])
-                                else
-                                    err = TranslateCap("commanderror_invalidweapon")
                                 end
                             elseif v.type == "any" then
                                 newArgs[v.name] = args[k]
@@ -218,14 +212,12 @@ function Core.SavePlayer(xPlayer, cb)
         xPlayer.job.grade,
         xPlayer.group,
         json.encode(xPlayer.getCoords(false, true)),
-        json.encode(xPlayer.getInventory(true)),
-        json.encode(xPlayer.getLoadout(true)),
         json.encode(xPlayer.getMeta()),
         xPlayer.identifier,
     }
 
     MySQL.prepare(
-        "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ?, `metadata` = ? WHERE `identifier` = ?",
+        "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `metadata` = ? WHERE `identifier` = ?",
         parameters,
         function(affectedRows)
             if affectedRows == 1 then
@@ -258,15 +250,13 @@ function Core.SavePlayers(cb)
             xPlayer.job.grade,
             xPlayer.group,
             json.encode(xPlayer.getCoords(false, true)),
-            json.encode(xPlayer.getInventory(true)),
-            json.encode(xPlayer.getLoadout(true)),
             json.encode(xPlayer.getMeta()),
             xPlayer.identifier,
         }
     end
 
     MySQL.prepare(
-        "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ?, `metadata` = ? WHERE `identifier` = ?",
+        "UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `metadata` = ? WHERE `identifier` = ?",
         parameters,
         function(results)
             if not results then
@@ -562,7 +552,7 @@ function ESX.RefreshJobs()
 
     if not Jobs then
         -- Fallback data, if no jobs exist
-        ESX.Jobs["unemployed"] = { name = "unemployed", label = "Unemployed", type = "civ", whitelisted = false, grades = { ["0"] = { grade = 0, name = "unemployed", label = "Unemployed", salary = 200, skin_male = {}, skin_female = {} } } }
+        ESX.Jobs["unemployed"] = { name = "unemployed", label = "Unemployed", type = "civ", whitelisted = false, grades = { ["0"] = { grade = 0, name = "unemployed", label = "Unemployed", salary = 200 } } }
     else
         ESX.Jobs = Jobs
     end
@@ -575,29 +565,9 @@ end
 ---@param cb function
 ---@return nil
 function ESX.RegisterUsableItem(item, cb)
-    Core.UsableItemsCallbacks[item] = cb
-end
-
----@param source number
----@param item string
----@param ... any
----@return nil
-function ESX.UseItem(source, item, ...)
-    if ESX.Items[item] then
-        local itemCallback = Core.UsableItemsCallbacks[item]
-
-        if itemCallback then
-            local success, result = pcall(itemCallback, source, item, ...)
-
-            if not success then
-                return result and print(result) or
-                print(('[^3WARNING^7] An error occured when using item ^5"%s"^7! This was not caused by ESX.'):format(
-                item))
-            end
-        end
-    else
-        print(('[^3WARNING^7] Item ^5"%s"^7 was used but does not exist!'):format(item))
-    end
+    exports.ox_inventory:RegisterUsableItem(item, function(playerId, _, _, ...)
+        cb(playerId, ...)
+    end)
 end
 
 ---@param index string
@@ -621,11 +591,8 @@ end
 ---@return string?
 ---@diagnostic disable-next-line: duplicate-set-field
 function ESX.GetItemLabel(item)
-    if ESX.Items[item] then
-        return ESX.Items[item].label
-    else
-        print(("[^3WARNING^7] Attemting to get invalid Item -> ^5%s^7"):format(item))
-    end
+    local itemData = exports.ox_inventory:GetItem(item)
+    return itemData and itemData.label or nil
 end
 
 ---@param jobType string|string[]?
@@ -668,154 +635,6 @@ function ESX.GetUsableItems()
         Usables[k] = true
     end
     return Usables
-end
-
-if not Config.CustomInventory then
-    ---@param itemType string
-    ---@param name string
-    ---@param count integer
-    ---@param label string
-    ---@param playerId number
-    ---@param components? string | table
-    ---@param tintIndex? integer
-    ---@param coords? table | vector3
-    ---@return nil
-    function ESX.CreatePickup(itemType, name, count, label, playerId, components, tintIndex, coords)
-        local pickupId = (Core.PickupId == 65635 and 0 or Core.PickupId + 1)
-        local xPlayer = ESX.Players[playerId]
-        coords = ((type(coords) == "vector3" or type(coords) == "vector4") and coords.xyz or xPlayer.getCoords(true))
-
-        Core.Pickups[pickupId] = { type = itemType, name = name, count = count, label = label, coords = coords }
-
-        if itemType == "item_weapon" then
-            Core.Pickups[pickupId].components = components
-            Core.Pickups[pickupId].tintIndex = tintIndex
-        end
-
-        TriggerClientEvent("esx:createPickup", -1, pickupId, label, coords, itemType, name, components, tintIndex)
-        Core.PickupId = pickupId
-    end
-
-    local function refreshPlayerInventories()
-        local xPlayers = ESX.GetExtendedPlayers()
-        for i = 1, #xPlayers do
-            local xPlayer = xPlayers[i]
-            local minimalInv = xPlayer.getInventory(true)
-
-            for itemName, _ in pairs(minimalInv) do
-                if not ESX.Items[itemName] then
-                    xPlayer.setInventoryItem(itemName, 0)
-                    minimalInv[itemName] = nil
-                end
-            end
-
-            xPlayer.inventory = {}
-            local playerInvIndex = 1
-            for itemName, itemData in pairs(ESX.Items) do
-                xPlayer.inventory[playerInvIndex] = {
-                    name = itemName,
-                    count = minimalInv[itemName] or 0,
-                    label = itemData.label,
-                    weight = itemData.weight,
-                    usable = Core.UsableItemsCallbacks[itemName] ~= nil,
-                    rare = itemData.rare,
-                    canRemove = itemData.canRemove,
-                }
-                playerInvIndex += 1
-            end
-
-            TriggerClientEvent("esx:setInventory", xPlayer.source, xPlayer.inventory)
-        end
-    end
-
-    ---@return number newItemCount
-    function ESX.RefreshItems()
-        ESX.Items = {}
-
-        local items = MySQL.query.await("SELECT * FROM items")
-        local itemCount = #items
-        for i = 1, itemCount do
-            local item = items[i]
-            ESX.Items[item.name] = { label = item.label, weight = item.weight, rare = item.rare, canRemove = item
-            .can_remove }
-        end
-        refreshPlayerInventories()
-
-        return itemCount
-    end
-
-    ---@param items { name: string, label: string, weight?: number, rare?: boolean, canRemove?: boolean }[]
-    function ESX.AddItems(items)
-        local toInsert = {}
-        local toInsertIndex = 1
-
-        for i = 1, #items do
-            local item = items[i]
-            local name = item.name
-            local label = item.label
-            local weight = item.weight or 1
-            local rare = item.rare or false
-            local canRemove = item.canRemove ~= false
-
-            if type(name) ~= "string" then
-                print(("^1[AddItems]^0 Invalid item name: %s"):format(name))
-                goto continue
-            end
-
-            if ESX.Items[name] then
-                goto continue
-            end
-
-            if type(label) ~= "string" then
-                print(("^1[AddItems]^0 Invalid label for item '%s'"):format(name))
-                goto continue
-            end
-
-            if type(weight) ~= "number" then
-                print(("^1[AddItems]^0 Invalid weight for item '%s'"):format(name))
-                goto continue
-            end
-
-            if type(rare) ~= "boolean" then
-                print(("^1[AddItems]^0 Invalid rare flag for item '%s'"):format(name))
-                goto continue
-            end
-
-            if type(canRemove) ~= "boolean" then
-                print(("^1[AddItems]^0 Invalid canRemove flag for item '%s'"):format(name))
-                goto continue
-            end
-
-            toInsert[toInsertIndex] = {
-                name = name,
-                label = label,
-                weight = weight,
-                rare = rare,
-                canRemove = canRemove,
-            }
-            toInsertIndex += 1
-
-            ::continue::
-        end
-
-        if #toInsert > 0 then
-            MySQL.prepare.await(
-            "INSERT IGNORE INTO `items` (`name`, `label`, `weight`, `rare`, `can_remove`) VALUES (?, ?, ?, ?, ?)",
-                toInsert)
-
-            for i = 1, #toInsert do
-                local row = toInsert[i]
-                ESX.Items[row.name] = {
-                    label = row.label,
-                    weight = row.weight,
-                    rare = row.rare,
-                    canRemove = row.canRemove,
-                }
-            end
-
-            refreshPlayerInventories()
-        end
-    end
 end
 
 ---@param job string

@@ -6,10 +6,7 @@ RegisterNetEvent("esx:onPlayerSpawn", function()
     ESX.Players[source].spawned = true
 end)
 
-if Config.CustomInventory then
-    SetConvarReplicated("inventory:framework", "esx")
-    SetConvarReplicated("inventory:weight", tostring(Config.MaxWeight * 1000))
-end
+SetConvarReplicated("inventory:framework", "esx")
 
 local function StartDBSync()
     CreateThread(function()
@@ -23,10 +20,6 @@ end
 
 MySQL.ready(function()
     Core.DatabaseConnected = true
-
-    if not Config.CustomInventory then
-        ESX.RefreshItems()
-    end
 
     ESX.RefreshJobs()
 
