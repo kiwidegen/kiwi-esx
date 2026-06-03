@@ -290,6 +290,7 @@ function loadESXPlayer(identifier, playerId, isNew)
     end
 
     TriggerEvent("esx:playerLoaded", playerId, xPlayer, isNew)
+    TriggerEvent("ox_inventory:setPlayerInventory", xPlayer)
     userData.money = xPlayer.getMoney()
     userData.variables = xPlayer.variables or {}
     xPlayer.triggerEvent("esx:playerLoaded", userData, isNew)

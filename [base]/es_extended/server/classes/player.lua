@@ -390,6 +390,17 @@ function CreateExtendedPlayer(playerId, identifier, ssn, group, accounts, job, n
         return exports.ox_inventory:CanCarryItem(self.source, itemName, count)
     end
 
+    function self.syncInventory(weight, maxWeight, items, accounts)
+        if accounts then
+            for accountName, money in pairs(accounts) do
+                local account = self.getAccount(accountName)
+                if account then
+                    self.setAccountMoney(accountName, money)
+                end
+            end
+        end
+    end
+
     function self.getSource()
         return self.source
     end

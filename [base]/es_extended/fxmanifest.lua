@@ -64,5 +64,4 @@ dependencies {
 	'oxmysql',
 	'ox_lib',
 	'ox_inventory',
-	'illenium-appearance',
 }

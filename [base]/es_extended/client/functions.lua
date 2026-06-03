@@ -105,6 +105,20 @@ function ESX.SpawnPlayer(coords, cb)
         Wait(0)
     end
 
+    -- Ensure player is on the correct MP freemode ped before resurrection.
+    -- illenium-appearance will apply the saved appearance on top of this.
+    local sex = ESX.PlayerData and ESX.PlayerData.sex
+    local model = (sex == "f") and `mp_f_freemode_01` or `mp_m_freemode_01`
+    if GetEntityModel(playerPed) ~= model then
+        RequestModel(model)
+        while not HasModelLoaded(model) do Wait(0) end
+        SetPlayerModel(PlayerId(), model)
+        Wait(150)
+        SetModelAsNoLongerNeeded(model)
+        playerPed = PlayerPedId()
+        SetPedDefaultComponentVariation(playerPed)
+    end
+
     NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, coords.heading, 0, true)
     TriggerEvent('playerSpawned', coords)
     cb()
