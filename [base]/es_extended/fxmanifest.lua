@@ -1,67 +1,40 @@
 fx_version 'cerulean'
-
 game 'gta5'
-description 'The Core resource that provides the functionalities for all other resources.'
 lua54 'yes'
-version '1.13.5'
+description 'Lean ESX core — identity, jobs, money only. ox suite handles everything else.'
+version '2.0.0'
 
 shared_scripts {
-	'locale.lua',
-	'@ox_lib/init.lua',
-
-	'shared/config/main.lua',
-    'shared/config/adjustments.lua',
-
-    'shared/main.lua',
-    'shared/functions.lua',
-    'shared/modules/*.lua',
+    '@ox_lib/init.lua',
+    'shared/config.lua',
+    'shared/utils.lua',
 }
 
 server_scripts {
-	'@oxmysql/lib/MySQL.lua',
-    'shared/config/logs.lua',
-
-	'server/core.lua',
-	'server/functions.lua',
-	'server/common.lua',
-	'server/modules/callback.lua',
-	'server/classes/player.lua',
-	'server/classes/vehicle.lua',
-	'server/modules/onesync.lua',
-	'server/modules/paycheck.lua',
-
-	'server/main.lua',
-	'server/modules/commands.lua',
-
-	'server/modules/createJob.lua',
+    '@oxmysql/lib/MySQL.lua',
+    'server/main.lua',
+    'server/functions.lua',
+    'server/events.lua',
+    'server/commands.lua',
 }
 
 client_scripts {
+    'client/adjustments.lua',
+    'client/death.lua',
     'client/main.lua',
-	'client/functions.lua',
-	'client/modules/callback.lua',
-    'client/modules/adjustments.lua',
-	'client/modules/points.lua',
-
-	'client/modules/events.lua',
-
-	'client/modules/actions.lua',
-	'client/modules/death.lua',
-    'client/modules/interactions.lua',
-	'client/modules/scaleform.lua',
-	'client/modules/streaming.lua',
+    'client/functions.lua',
+    'client/commands.lua',
 }
 
 files {
-	'imports.lua',
-	'locales/*.lua',
-	'locale.js',
+    'imports.lua',
 }
 
 dependencies {
-	'/native:0x6AE51D4B',
+    '/native:0x6AE51D4B',
     '/native:0xA61C8FC6',
-	'oxmysql',
-	'ox_lib',
-	'ox_inventory',
+    'oxmysql',
+    'ox_lib',
+    'ox_inventory',
+    'ox_target',
 }
