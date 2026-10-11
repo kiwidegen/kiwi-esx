@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS `users` (
     `sex`         VARCHAR(1)   NULL DEFAULT NULL,
     `height`      INT          NULL DEFAULT NULL,
 
+    -- read by illenium-appearance (esx) to migrate legacy esx_skin into playerskins
+    `skin`        LONGTEXT     NULL DEFAULT NULL,
+
     -- kept for data preservation only — no longer written by es_extended
     `inventory`   LONGTEXT     NULL DEFAULT NULL,
     `loadout`     LONGTEXT     NULL DEFAULT NULL,
@@ -119,6 +122,53 @@ INSERT IGNORE INTO `job_grades` (`job_name`, `grade`, `name`, `label`, `salary`,
     ('tailor',      0, 'employee',     'Employee',         0, '{}', '{}'),
     ('miner',       0, 'employee',     'Employee',         0, '{}', '{}'),
     ('slaughterer', 0, 'employee',     'Employee',         0, '{}', '{}');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- licenses / user_licenses
+-- Required by the ox_inventory ESX bridge (weapon license + license checks).
+-- ox_inventory seeds the 'weapon' license itself on first start.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS `licenses` (
+    `type`  VARCHAR(60) NOT NULL,
+    `label` VARCHAR(60) NOT NULL,
+
+    PRIMARY KEY (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO `licenses` (`type`, `label`) VALUES
+    ('dmv',         'Driving Permit'),
+    ('drive',       'Drivers License'),
+    ('drive_bike',  'Motorcycle License'),
+    ('drive_truck', 'Commercial Drivers License'),
+    ('weapon',      'Weapon License');
+
+CREATE TABLE IF NOT EXISTS `user_licenses` (
+    `id`    INT         NOT NULL AUTO_INCREMENT,
+    `type`  VARCHAR(60) NOT NULL,
+    `owner` VARCHAR(60) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    KEY `owner` (`owner`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- owned_vehicles
+-- Required by the ox_inventory ESX bridge for trunk / glovebox storage.
+-- ox_inventory auto-adds the `glovebox` and `trunk` columns on first start.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS `owned_vehicles` (
+    `owner`   VARCHAR(60)  DEFAULT NULL,
+    `plate`   VARCHAR(12)  NOT NULL,
+    `vehicle` LONGTEXT     DEFAULT NULL,
+    `type`    VARCHAR(20)  NOT NULL DEFAULT 'car',
+    `job`     VARCHAR(20)  DEFAULT NULL,
+    `stored`  TINYINT(4)   NOT NULL DEFAULT 0,
+
+    PRIMARY KEY (`plate`),
+    KEY `owner` (`owner`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
 

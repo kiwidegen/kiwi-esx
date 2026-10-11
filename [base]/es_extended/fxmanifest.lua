@@ -28,6 +28,7 @@ client_scripts {
 
 files {
     'imports.lua',
+    'locale.lua',
 }
 
 dependencies {
