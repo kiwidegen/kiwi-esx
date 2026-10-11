@@ -48,7 +48,20 @@ CREATE TABLE IF NOT EXISTS `jobs` (
     PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO `jobs` VALUES ('unemployed', 'Unemployed', 'civ');
+INSERT IGNORE INTO `jobs` (`name`, `label`, `type`) VALUES
+    ('unemployed',  'Unemployed', 'civ'),
+    ('police',      'LSPD',       'leo'),
+    ('ambulance',   'EMS',        'ems'),
+    ('mechanic',    'Mechanic',   'mechanic'),
+    ('cardealer',   'Cardealer',  'civ'),
+    ('taxi',        'Taxi',       'civ'),
+    ('lumberjack',  'Lumberjack', 'civ'),
+    ('fisherman',   'Fisherman',  'civ'),
+    ('fueler',      'Fueler',     'civ'),
+    ('reporter',    'Reporter',   'civ'),
+    ('tailor',      'Tailor',     'civ'),
+    ('miner',       'Miner',      'civ'),
+    ('slaughterer', 'Butcher',    'civ');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- job_grades
@@ -68,8 +81,44 @@ CREATE TABLE IF NOT EXISTS `job_grades` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO `job_grades` (`job_name`, `grade`, `name`, `label`, `salary`, `skin_male`, `skin_female`)
-VALUES ('unemployed', 0, 'unemployed', 'Unemployed', 200, '{}', '{}');
+INSERT IGNORE INTO `job_grades` (`job_name`, `grade`, `name`, `label`, `salary`, `skin_male`, `skin_female`) VALUES
+    ('unemployed',  0, 'unemployed',   'Unemployed',     200, '{}', '{}'),
+
+    ('police',      0, 'recruit',      'Recruit',         20, '{}', '{}'),
+    ('police',      1, 'officer',      'Officer',         40, '{}', '{}'),
+    ('police',      2, 'sergeant',     'Sergeant',        60, '{}', '{}'),
+    ('police',      3, 'lieutenant',   'Lieutenant',      85, '{}', '{}'),
+    ('police',      4, 'boss',         'Captain',        100, '{}', '{}'),
+
+    ('ambulance',   0, 'ambulance',    'Jr. EMT',         20, '{}', '{}'),
+    ('ambulance',   1, 'doctor',       'EMT',             40, '{}', '{}'),
+    ('ambulance',   2, 'chief_doctor', 'Sr. EMT',         60, '{}', '{}'),
+    ('ambulance',   3, 'boss',         'EMT Supervisor',  80, '{}', '{}'),
+
+    ('mechanic',    0, 'recrue',       'Recruit',         12, '{}', '{}'),
+    ('mechanic',    1, 'novice',       'Novice',          24, '{}', '{}'),
+    ('mechanic',    2, 'experimente',  'Experienced',     36, '{}', '{}'),
+    ('mechanic',    3, 'chief',        'Leader',          48, '{}', '{}'),
+    ('mechanic',    4, 'boss',         'Boss',             0, '{}', '{}'),
+
+    ('cardealer',   0, 'recruit',      'Recruit',         10, '{}', '{}'),
+    ('cardealer',   1, 'novice',       'Novice',          25, '{}', '{}'),
+    ('cardealer',   2, 'experienced',  'Experienced',     40, '{}', '{}'),
+    ('cardealer',   3, 'boss',         'Boss',             0, '{}', '{}'),
+
+    ('taxi',        0, 'recrue',       'Recruit',         12, '{}', '{}'),
+    ('taxi',        1, 'novice',       'Cabby',           24, '{}', '{}'),
+    ('taxi',        2, 'experimente',  'Experienced',     36, '{}', '{}'),
+    ('taxi',        3, 'uber',         'Uber Cabby',      48, '{}', '{}'),
+    ('taxi',        4, 'boss',         'Lead Cabby',       0, '{}', '{}'),
+
+    ('lumberjack',  0, 'employee',     'Employee',         0, '{}', '{}'),
+    ('fisherman',   0, 'employee',     'Employee',         0, '{}', '{}'),
+    ('fueler',      0, 'employee',     'Employee',         0, '{}', '{}'),
+    ('reporter',    0, 'employee',     'Employee',         0, '{}', '{}'),
+    ('tailor',      0, 'employee',     'Employee',         0, '{}', '{}'),
+    ('miner',       0, 'employee',     'Employee',         0, '{}', '{}'),
+    ('slaughterer', 0, 'employee',     'Employee',         0, '{}', '{}');
 
 SET FOREIGN_KEY_CHECKS = 1;
 

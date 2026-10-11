@@ -53,43 +53,49 @@ tasks:
   - action: query_database
     file: ./resources/[base]/es_extended/es_extended.sql
 
+  - action: query_database
+    file: ./resources/[scripts]/[opensource]/esx_addonaccount/esx_addonaccount.sql
+
+  - action: query_database
+    file: ./resources/[scripts]/[opensource]/esx_society/esx_society.sql
+
   - action: download_file
-    url: https://github.com/CommunityOx/oxmysql/releases/download/v2.12.3/oxmysql.zip
+    url: https://github.com/overextended/oxmysql/releases/download/v2.14.3/oxmysql.zip
     path: ./tmp/oxmysql.zip
   - action: unzip
     src: ./tmp/oxmysql.zip
     dest: ./resources/[ox]/
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_lib/releases/latest/download/ox_lib.zip
+    url: https://github.com/overextended/ox_lib/releases/latest/download/ox_lib.zip
     path: ./tmp/ox_lib.zip
   - action: unzip
     src: ./tmp/ox_lib.zip
     dest: ./resources/[ox]/
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_inventory/releases/download/v2.45.0/ox_inventory.zip
+    url: https://github.com/overextended/ox_inventory/releases/download/v2.48.0/ox_inventory.zip
     path: ./tmp/ox_inventory.zip
   - action: unzip
     src: ./tmp/ox_inventory.zip
     dest: ./resources/[ox]/
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_target/releases/latest/download/ox_target.zip
+    url: https://github.com/overextended/ox_target/releases/latest/download/ox_target.zip
     path: ./tmp/ox_target.zip
   - action: unzip
     src: ./tmp/ox_target.zip
     dest: ./resources/[ox]/
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_fuel/releases/latest/download/ox_fuel.zip
+    url: https://github.com/overextended/ox_fuel/releases/latest/download/ox_fuel.zip
     path: ./tmp/ox_fuel.zip
   - action: unzip
     src: ./tmp/ox_fuel.zip
     dest: ./resources/[ox]/
 
   - action: download_file
-    url: https://github.com/CommunityOx/ox_doorlock/releases/latest/download/ox_doorlock.zip
+    url: https://github.com/overextended/ox_doorlock/releases/latest/download/ox_doorlock.zip
     path: ./tmp/ox_doorlock.zip
   - action: unzip
     src: ./tmp/ox_doorlock.zip
